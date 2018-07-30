@@ -14,8 +14,8 @@ import UIKit
 class TodoListViewController: UITableViewController {
     
 
-    
-    let itemArray = ["1","iki","üç"]
+    // let kelimesi immutable dır. Bunun yerine mutable olan var kodunu kullanıp aşağıda append yapabileceğiz.
+    var itemArray = ["1","iki","üç"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +55,34 @@ class TodoListViewController: UITableViewController {
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    //Mark - Add new items
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        var textField = UITextField()
+        
+        let alert = UIAlertController(title: "Yeni Bir Yapılacak Ekle", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Yeni Ekle", style: .default) { (action) in
+        
+        // alert kısmından gelen ve global değişkene atanan değer array list e ekleniyor.
+        self.itemArray.append(textField.text!)
+        // bu satır olmadan table a yansımıyor yani görünmüyor. append yaptıktan sonra mutlaka table view e reload yapmak gereklidir.
+        self.tableView.reloadData()
+        
+        }
+        // alert i clouser ın dışına çıkarmak için global değişken ekliyoruz.(textField yukarıda tanımlandı). Burada alertTextField den gelen değer global değişkene aktarılıyor.
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Yeni Bir Yapılacak Ekle"
+            textField = alertTextField
+        }
+        alert.addAction(action)
+        // show alert
+        present(alert, animated: true, completion: nil)
+    }
+    
+    
+    
+    
 
 }
 
