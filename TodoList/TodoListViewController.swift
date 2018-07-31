@@ -15,12 +15,21 @@ class TodoListViewController: UITableViewController {
     
 
     // let kelimesi immutable dır. Bunun yerine mutable olan var kodunu kullanıp aşağıda append yapabileceğiz.
+    
     var itemArray = ["1","iki","üç"]
-
+    
+    // kalıcı olarak verileri saklamak için bir saklama biçimi herhalde.
+    let defaults = UserDefaults.standard
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Do any additional setup after loading the view, typically from a nib.
+        // retrieve data from a registered plist(local de "self.defaults.set(self.itemArray, forKey: "TodoListArray")"
+        // işlemindeen sonra plist dosyasına atılıyor veri) aşağıdaki işlem ile geri çekiyoruz.
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -65,10 +74,14 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Yeni Ekle", style: .default) { (action) in
         
         // alert kısmından gelen ve global değişkene atanan değer array list e ekleniyor.
-        self.itemArray.append(textField.text!)
-        // bu satır olmadan table a yansımıyor yani görünmüyor. append yaptıktan sonra mutlaka table view e reload yapmak gereklidir.
-        self.tableView.reloadData()
-        
+            self.itemArray.append(textField.text!)
+            
+            // verileri append ettikten sonra saklamayı sağlıyoruz.
+            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+            
+            // bu satır olmadan table a yansımıyor yani görünmüyor. append yaptıktan sonra mutlaka table view e reload yapmak gereklidir.
+            self.tableView.reloadData()
+            
         }
         // alert i clouser ın dışına çıkarmak için global değişken ekliyoruz.(textField yukarıda tanımlandı). Burada alertTextField den gelen değer global değişkene aktarılıyor.
         alert.addTextField { (alertTextField) in
