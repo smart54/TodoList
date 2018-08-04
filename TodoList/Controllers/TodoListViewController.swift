@@ -2,56 +2,37 @@
 
 import UIKit
 // bu satırı eklemeyi unutma
+// Dikkat TableView delegate ve datasource kodlarını eklemeyi unutma. Ayrıca SearchBar için de aynı şekilde delegate yap. Çok önemli yoksa çalışmıyor.
 import CoreData
 
 // main story de default gelen UIView i sildik. yerine sağ alttan tableViewController sürükledik. şimdi bunu bu sınıf ile bağlamak için UIViewController(default) sınıfını silip yerine "UITableViewController" ekliyoruz. sonra da sağ taraftan
 // "ViewController" yazan dosyanın ismini "TodoListViewController" koyuyoruz(keyfi). sonrasıda aşağıdaki class ismini de anyı isimle değiştiriyoruz. En sonda da inspector kısmından class ismini değiştiriyoruz.
 // neden delegate ve datasource u burada belirtmedik? Single subclassing diyor cevabı ama araştır.
+
 class TodoListViewController: UITableViewController {
     
-
-    // let kelimesi immutable dır. Bunun yerine mutable olan var kodunu kullanıp aşağıda append yapabileceğiz.
-    
+    // let kelimesi immutable dır. Bunun yerine mutable olan var kodunu kullanıp aşağıda append yapabileceğiz
     var itemArray = [Item]()
-    
-    // kalıcı olarak verileri saklamak için bir saklama biçimi herhalde. plist dosyasında saklanır. çağrıldığında hepsini getirir. özellikle default muzik sesi vs. küçük durumlar için kullanılır. arraylist vs. için kullanılmaz genelde. custom datatype için genelde UserDefaults kullanılmaz. UserDefaults genelde standart veri tipleri için kullanılır.
-    // Yukarıdaki açıklamalar aşağıda uncomment yapılan satır için geçerliydi
-    // let defaults = UserDefaults.standard
-    
-    
-    // filemanager ile data file path oluşturuyoruz. array olduğu için ilk elemanı istiyoruz. first den sonraki kısım Item adlı plist dosyası oluşturmamız içindir. Global constant olarak tanıtıyoruz.
-  
-    
-    // aşağıdaki satırla UIApplication sınıfına giriyoruz. shared singleton objesini alıyoruz. persistentContainer giriyoruz ve viewContext i yakalıyoruz.
+
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
-    
+  
 // aşağıdaki kodlara artık lüzum görmüyoruz. loadItems() metoduyla verileri plistten decode edip  array türüne dönüştüreceğiz
     override func viewDidLoad() {
      super.viewDidLoad()
 
-    
         // database dosyamızın hangi dosyada saklı olduğunu öğrenmek için yazıyoruz bu kodu
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         loadItems()
-        
-        // retrieve data from a registered plist(local de "self.defaults.set(self.itemArray, forKey: "TodoListArray")"
-        // işleminden sonra plist dosyasına atılıyor veri) aşağıdaki işlem ile geri çekiyoruz. alınan veri bu sefer Item objesi...
-        // Yukarıdaki yorum satırları aşağıdaki 2 uncomment olan kod satırı içindir.
-        // if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-        // itemArray = items
 }
  
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return itemArray.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-      
+
         // indexPath yukarıdaki değişkendir.(current IndexPath)
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
         
@@ -63,11 +44,9 @@ class TodoListViewController: UITableViewController {
 
         return cell
         
-        
     }
     
     //Mark - Table View Delegate Methods
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         // burada seçilen row un accessory kısmını checkmark yapıyoruz. eğer checkmark ise none ile uncheck yaptırıyoruz.
@@ -75,17 +54,9 @@ class TodoListViewController: UITableViewController {
         // dikkat! operatörü aynen aşağıda kullanıldığı gibi kullan yoksa hata veriyor.
             itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
-        // herhangi bir satıra basıldığında satırın silinmesini istiyorsak sıralamanın aşağıdaki gibi olması gerekiyor. aksi takdirde hata veriyor. ilk başta context den sonra itemArraydan silinmesi gerekiyor. aksi takdirde itemAray objesi kullanıldığı için index hatası veriyor.
-//        context.delete(itemArray[indexPath.row])
-//        itemArray.remove(at: indexPath.row)
-      
-       // reload metodu saveItems() metodunda kullanıldığı için tekrardan yazmaya gerek yok.
-        // yaptığımız değişikliklerden sonra veriyi permenant yapmak için bu metodu kullanmamız gerekiyor. 
-        
         saveItems()
       
-        
-        //tableView.deselectRow(at: indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     //Mark - Add new items
@@ -94,10 +65,7 @@ class TodoListViewController: UITableViewController {
         var textField = UITextField()
         let alert = UIAlertController(title: "Yeni Bir Yapılacak Ekle", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Yeni Ekle", style: .default) { (action) in
-        
-            
-            
-            
+     
             // butona basar basmaz bir Item objesi oluşturuluyor. Bu Item objesi CoreModel attribute ları oluşturulurken otomatik oluşturulmuştu. Bu sınıflar localde library de görüntülenebilir. videolarda mevcut
             let newItem = Item(context: self.context)
             // şimdi her bir attribute a ulaşabiliyoruz ve bunları dolduruyoruz.
@@ -118,8 +86,6 @@ class TodoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    
-   
     func saveItems() {
        
         do {
@@ -141,7 +107,7 @@ class TodoListViewController: UITableViewController {
         
         // context fetch request yapıyor.
         do{
-        itemArray = try context.fetch(request)
+            itemArray = try context.fetch(request)
         } catch {
             print("error by the time of fetching \(error)")
         }
@@ -161,10 +127,7 @@ extension TodoListViewController: UISearchBarDelegate{
         // Aşağıdaki nasıl sorgu yapılacağını belirtiyor.
         // Database den title attribute a bakılacak. %@(searchBar.text!) argümanının içerecek(CONTAINS). [cd] komutu case insensitive yapıyor aramayı. [cd] komutunu yerleştirmeksek case sensitive olacak.
         request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-        
-        
-       
-        
+    
         // Aşağıdaki satır database den aldığımız satırın nasıl sıralanacağını belirtiyor.
         // Belirtildiği gibi alfabetik sıraya göre sıralama yapacak.
          request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
