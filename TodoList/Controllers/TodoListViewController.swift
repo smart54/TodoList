@@ -15,15 +15,23 @@ class TodoListViewController: UITableViewController {
     var itemArray = [Item]()
 
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-  
+    
+    // selectedCategory bir değer ile set edilir edilmez loadItems() yüklenir.
+    var selectedCategory : Category? {
+        didSet {
+            loadItems()
+        }
+    }
+    
+    
 // aşağıdaki kodlara artık lüzum görmüyoruz. loadItems() metoduyla verileri plistten decode edip  array türüne dönüştüreceğiz
     override func viewDidLoad() {
      super.viewDidLoad()
 
         // database dosyamızın hangi dosyada saklı olduğunu öğrenmek için yazıyoruz bu kodu
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
-        loadItems()
+        // ilk başlangıç sayfamız olmadığı için bu metod içinde kullanımını kaldırdık. kategoriye göre veri yüklenecek. 
+        // loadItems()
 }
  
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -71,6 +79,8 @@ class TodoListViewController: UITableViewController {
             // şimdi her bir attribute a ulaşabiliyoruz ve bunları dolduruyoruz.
             newItem.title = textField.text!
             newItem.done = false
+            // çok önemli burayı iyice araştır.
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             // bu attribute lar doldurulduktan sonra kalıcı olarak saklamak için save ediyoruz. aşağıdaki metodun içeriğine bak
             self.saveItems()
@@ -103,8 +113,18 @@ class TodoListViewController: UITableViewController {
     
     // request internal item. with request internal item.
     // loadItems() ile parametresiz çağrıldığında default olarak eşitliğin sağ tarafındaki kısım icra edilir yani request değişkenine atanır. loadItems(with: request) parametre ile çağrıldığında eşitliğin sol yanı icra ediliyor yani bir nevi sağ taraf yok sayılıyor.
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
         
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let additionalPredicate = predicate{
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,additionalPredicate])
+        }else{
+            request.predicate = categoryPredicate
+        }
+//        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,predicate])
+//
+//        request.predicate = compoundPredicate
         // context fetch request yapıyor.
         do{
             itemArray = try context.fetch(request)
@@ -124,18 +144,40 @@ extension TodoListViewController: UISearchBarDelegate{
         // contexten bilgi almak için fetch request yapıyoruz.
         let request : NSFetchRequest<Item> = Item.fetchRequest()
         
+      
+        
         // Aşağıdaki nasıl sorgu yapılacağını belirtiyor.
         // Database den title attribute a bakılacak. %@(searchBar.text!) argümanının içerecek(CONTAINS). [cd] komutu case insensitive yapıyor aramayı. [cd] komutunu yerleştirmeksek case sensitive olacak.
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
     
         // Aşağıdaki satır database den aldığımız satırın nasıl sıralanacağını belirtiyor.
         // Belirtildiği gibi alfabetik sıraya göre sıralama yapacak.
          request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
-        // request i parametre olarak gönderiyoruz. tableReload u aşağıya yazmamıza gerek yok.
-        loadItems(with: request)
+        // request i parametre olarak gönderiyoruz. tableReload u aşağıya yazmamıza gerek yok. Dikkat edilirse predicate parametresini sonradan ekledik loadItems() a şimdi değer olarak gönderiyoruz.
+        loadItems(with: request, predicate: predicate)
    
         
+    }
+    
+    // aşağıdaki metodda searchbardaki x işaretine basıldığında iki işlem aynı anda yapılıyor. bu işlemlerden biri loadItems() diğeri ise searchBar.resignFirstResponder() işlemi yani klavyenin keyboardı bırakıp eski haline dönmesini istiyoruz. bu yüzden asenkron bir işlem içerisine alınmış searchBar.resignFirstResponder() işlemi.
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // search bar kısmındaki çarpıya basıldığında text sıfırlanıyor. bu olduğu takdirde database deki bütün verileri tekrardan yüklüyoruz.
+        if searchBar.text?.count == 0{
+            
+             loadItems()
+            
+            
+            // DispatchQueue bir yönetici main i yakalayıp asenkron bir şekilde çalıştırıyor. Nedenlerini daha iyi araştır.
+            // searchBar.resignFirstResponder() kıvırcık parantezden çıkarıldığında klavye gözden kaybolmuyor.
+            DispatchQueue.main.async {
+                // search bardaki çarpı işaretine basıldığında keyboard ortadan kayboluyor. bunu asenkron bir metodla yapıyoruz. Neden?
+                searchBar.resignFirstResponder()
+               
+            }
+
+            
+        }
     }
     
 }

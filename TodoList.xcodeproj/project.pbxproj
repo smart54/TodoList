@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B439FF0B2116197000B9E1CD /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439FF0A2116197000B9E1CD /* CategoryViewController.swift */; };
 		B4D4394B210F0202007B9BDE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D4394A210F0202007B9BDE /* AppDelegate.swift */; };
 		B4D4394D210F0202007B9BDE /* TodoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D4394C210F0202007B9BDE /* TodoListViewController.swift */; };
 		B4D43950210F0202007B9BDE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B4D4394E210F0202007B9BDE /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B439FF0A2116197000B9E1CD /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
 		B4D43947210F0202007B9BDE /* TodoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4D4394A210F0202007B9BDE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B4D4394C210F0202007B9BDE /* TodoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListViewController.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 		B4D4395F2111431A007B9BDE /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				B439FF0A2116197000B9E1CD /* CategoryViewController.swift */,
 				B4D4394C210F0202007B9BDE /* TodoListViewController.swift */,
 			);
 			path = Controllers;
@@ -171,6 +174,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B439FF0B2116197000B9E1CD /* CategoryViewController.swift in Sources */,
 				B4D4394D210F0202007B9BDE /* TodoListViewController.swift in Sources */,
 				B4D4398521129804007B9BDE /* DataModel.xcdatamodeld in Sources */,
 				B4D4394B210F0202007B9BDE /* AppDelegate.swift in Sources */,
